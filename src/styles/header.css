@@ -1,16 +1,39 @@
 .header {
     background-color: #d9d9d9;
-    padding: 10px 20px;
+    padding: 8px 15px;
     display: flex;
     justify-content: center;
     align-items: center;
 
     max-width: 100%;
     max-width: 350px;
+    max-height: 40px;
     border-radius: 0px 0px 10px 10px;
+    border: 1px solid black;
+    border-top: 0px solid black;
+}
+
+.header a {
+  text-decoration: none;
+  color: #1a1a1a;
+  font-family: Verdana, sans-serif;
+}
+
+.header #new-ticket {
+  font-size: 30px;
+  font-weight: bold;
 }
 
 .navbar-element {
   padding-left: 10px;
   padding-right: 10px;
+}
+
+.navbar-element:hover {
+  cursor: pointer;
+}
+
+#navbar-logo {
+  width: 27px;
+  height: 27px;
 }
