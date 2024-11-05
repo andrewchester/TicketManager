@@ -38,8 +38,6 @@ function Home() {
   if (!auth.authenticated) 
     navigate('/');
 
-  console.log('length', tickets.length);
-
   return (
       <div>
         <Header />

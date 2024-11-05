@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
 
+import '../styles/login.css';
+
 const API_URI = 'http://localhost:5000'; // process.env.REACT_APP_API_URI;
 
 const Login = () => {
@@ -31,30 +33,32 @@ const Login = () => {
         }
     };
     return (
-        <div>
-            <h2>{loggingIn ? 'Login to an existing account' : 'Register'}</h2>
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="text"
-                    placeholder="Username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    required
-                />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                />
-                <button type="submit">
-                    {loggingIn ? 'Login' : 'Register'}
+        <div id="flex-container">
+            <div id="login-container">
+                <h3 id="login-title">{loggingIn ? 'Login' : 'Register'}</h3>
+                <form id="login-form" onSubmit={handleSubmit}>
+                    <input
+                        type="text"
+                        placeholder="Username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        required
+                    />
+                    <input
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
+                    <button id="submit-button" type="submit">
+                        {loggingIn ? 'Login' : 'Register'}
+                    </button>
+                </form>
+                <button id="toggle-button" onClick={toggleLogin}>
+                    {loggingIn ? 'Register Instead' : 'Login to an existing account'}
                 </button>
-            </form>
-            <button onClick={toggleLogin}>
-                {loggingIn ? 'Register Instead' : 'Login to an existing account'}
-            </button>
+            </div>
         </div>
     );
 };

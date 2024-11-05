@@ -1,0 +1,88 @@
+#flex-container {
+    height: 100vh;
+
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+}
+
+#login-container {
+    border: 2px solid #dddddd;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+    flex-flow: column;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+
+    height: 200px;
+
+    font-family: Verdana, sans-serif;
+}
+
+#login-title{
+    margin: 0px;
+    margin-left: 10px;
+}
+
+#login-form {
+    display: flex;
+    flex-direction: column; 
+    width: 150px; 
+    margin: 0 auto; 
+    padding: 20px;
+    border-radius: 8px;
+}
+
+#login-form button {
+    margin: 3px;
+    width: 50%;
+}
+
+#login-form input {
+    margin: 3px;
+    width:90%;
+}
+
+#toggle-button {
+    margin: 0px;
+    margin-left: 5px;
+}
+
+/*
+Credit to Github Button styles, modified slightly here
+*/
+
+/* CSS */
+button {
+  appearance: none;
+  background-color: #FAFBFC;
+  border: 1px solid rgba(27, 31, 35, 0.15);
+  box-shadow: rgba(27, 31, 35, 0.04) 0 1px 0, rgba(255, 255, 255, 0.25) 0 1px 0 inset;
+  box-sizing: border-box;
+  color: #24292E;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 20px;
+  list-style: none;
+  padding: 3px 10px;
+  position: relative;
+  transition: background-color 0.2s cubic-bezier(0.3, 0, 0.5, 1);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: middle;
+  white-space: nowrap;
+  word-wrap: break-word;
+}
+
+button:hover {
+  background-color: #F3F4F6;
+  text-decoration: none;
+  transition-duration: 0.1s;
+}
