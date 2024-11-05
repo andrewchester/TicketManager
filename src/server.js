@@ -1,74 +1,47 @@
 const express = require('express');
 const cors = require('cors');
-const db = require('./database');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const db = require('../config/database');
+const auth = require('../middleware/auth');
+require('dotenv').config({path: '../.env'});
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.get('/users', (req, res) => {
-  db.all("SELECT * FROM users", [], (err, rows) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.json(rows);
-  });
+app.post('/register', async (req, res) => {
+    const {username, password} = req.body;
+    const hashed = await bcrypt.hash(password, 10);
+
+    db.run(`INSERT INTO users (username, password, elevated) VALUES (?, ?, FALSE)`, [username, hashed], function (err) {
+        if (err) {
+            console.log(err);
+            return res.status(401).send("Invalid registration.")
+        }
+
+        const token = jwt.sign({ id: this.lastID }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        res.status(201).json({ token, message: `${username} registered` });
+
+        console.log('registered', username);
+    });
 });
 
-app.post('/user', (req, res) => {
-  const { name, email } = req.body;
-  db.run("INSERT INTO users (name, email) VALUES (?, ?)", [name, email], function(err) {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.status(201).json({ id: this.lastID, name, email });
-  });
+app.post('/login', async (req, res) => {
+    const {username, password} = req.body;
+    
+    db.get(`SELECT * FROM users WHERE username = ?`, [username], async (err, user) => {
+        if (!user || !(await bcrypt.compare(password, user.password))) {
+            return res.status(401).send("Invalid login.");
+        }
+
+        const token = jwt.sign({id: user.id}, process.env.JWT_SECRET, {expiresIn: '1h'});
+        res.json({token});
+    });
 });
 
-app.get('/agents', (req, res) => {
-  db.all("SELECT * FROM it_workers", [], (err, rows) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.json(rows);
-  });
-});
-
-app.post('/agent', (req, res) => {
-  const { name, email } = req.body;
-  db.run("INSERT INTO agents (name, email) VALUES (?, ?)", [name, email], function(err) {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.status(201).json({ id: this.lastID, name, email });
-  });
-});
-
-app.get('/tickets', (req, res) => {
-  db.all("SELECT * FROM tickets", [], (err, rows) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.json(rows);
-  });
-});
-
-// Create ticket endpoint
-app.post('/tickets', (req, res) => {
-  const { user_id, it_worker_id, title, description } = req.body;
-  db.run("INSERT INTO tickets (user_id, agent_id, title, description) VALUES (?, ?, ?, ?)", 
-    [user_id, NaN, title, description], function(err) {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.status(201).json({ id: this.lastID, user_id, it_worker_id, title, description });
-  });
+app.post('/tickets', auth, (req, res) => {
+    res.send('protected');
 });
 
 const PORT = process.env.BACKEND_PORT || 5000;
