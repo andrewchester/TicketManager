@@ -7,17 +7,20 @@ import React, { createContext, useContext, useState } from 'react';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+  const [username, setUsername] = useState(null);
+
   const [auth, setAuth] = useState({
     authenticated: !!localStorage.getItem('token'), 
     token: localStorage.getItem('token'),
   });
 
-  const login = (token) => {
+  const login = (token, user) => {
     localStorage.setItem('token', token);
     setAuth({
       authenticated: true,
       token,
     });
+    setUsername(user);
   };
 
   const logout = () => {
@@ -26,10 +29,11 @@ export const AuthProvider = ({ children }) => {
       authenticated: false,
       token: null,
     });
+    setUsername(null);
   };
 
   return (
-    <AuthContext.Provider value={{ auth, login, logout }}>
+    <AuthContext.Provider value={{ auth, username, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

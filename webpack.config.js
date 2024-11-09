@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
@@ -10,6 +11,12 @@ module.exports = {
   },
   devServer: {
     static: './dist',
+    proxy: [
+        {
+          context: ['/tickets'],
+          target: 'http://localhost:5000',
+        }
+    ]
   },
   module: {
     rules: [

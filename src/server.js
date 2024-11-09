@@ -35,13 +35,25 @@ app.post('/login', async (req, res) => {
             return res.status(401).send("Invalid login.");
         }
 
+        console.log(username, 'logged in');
+
         const token = jwt.sign({id: user.id}, process.env.JWT_SECRET, {expiresIn: '1h'});
         res.json({token});
     });
 });
 
-app.post('/tickets', auth, (req, res) => {
-    res.send('protected');
+app.get('/tickets', auth, (req, res) => {
+    tickets = [];
+
+    res.setHeader("Content-Type", "application/json");
+    res.status(200);
+    res.json(tickets);
+    res.send();
+});
+
+app.post('/ticket', auth, (req, res) => {
+    console.log(req.body);
+    res.status(200).message("Received Ticket");
 });
 
 const PORT = process.env.BACKEND_PORT || 5000;
