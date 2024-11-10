@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
+import {useAuth} from '../contexts/AuthContext'
 import '../styles/ticketform.css';
 
 const TicketCreator = ({closeForm}) => {
+    const {username} = useAuth();
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [submitting, setSubmitting] = useState(false);
@@ -26,12 +29,13 @@ const TicketCreator = ({closeForm}) => {
         setSubmitting(true);
 
         const ticket = {
+            "username": username,
             "title": title,
             "description": description,
         };
 
         try {
-            const response = await axios.post('/ticket', ticket);
+            const response = await axios.post('http://localhost:5000/ticket', ticket);
       
             console.log('Response:', response.data);
       
@@ -41,6 +45,7 @@ const TicketCreator = ({closeForm}) => {
             console.error('Error:', err);
         } finally {
             setSubmitting(false);
+            closeForm();
         }
     };
 

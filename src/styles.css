@@ -9,3 +9,7 @@ body {
     align-items:center;
     justify-content: center;
 }
+
+#home-message {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}

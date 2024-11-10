@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../config/database');
@@ -46,15 +47,17 @@ app.get('/tickets', auth, (req, res) => {
     tickets = [];
 
     res.setHeader("Content-Type", "application/json");
-    res.status(200);
     res.json(tickets);
-    res.send();
+    res.status(200);
 });
 
-app.post('/ticket', auth, (req, res) => {
-    console.log(req.body);
-    res.status(200).message("Received Ticket");
+app.post('/ticket', auth, (req, res) => {    
+    
+
+    res.status(200);
+    res.send("Added ticket");
 });
+
 
 const PORT = process.env.BACKEND_PORT || 5000;
 app.listen(PORT, () => {
