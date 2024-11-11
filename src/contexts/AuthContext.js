@@ -17,6 +17,7 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         if (auth.token) {
           axios.defaults.headers.common['Authorization'] = `Bearer ${auth.token}`;
+          axios.defaults.headers.common['user'] = username;
         } else {
           delete axios.defaults.headers.common['Authorization'];
         }

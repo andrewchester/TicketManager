@@ -13,7 +13,7 @@ function Home() {
     const [tickets, setTickets] = useState([]);
     const [message, setMessage] = useState('');
     const navigate = useNavigate();
-    const {auth} = useAuth();
+    const {auth, username} = useAuth();
 
     useEffect(() => {
       if (!auth.authenticated) {
@@ -27,7 +27,12 @@ function Home() {
     useEffect(() => {
       const fetchTickets = async () => {
         try {
-            const response = await axios.get(`http://localhost:5000/tickets`);
+            const response = await axios.get(`http://localhost:5000/tickets`, {
+              headers: {
+                  username: username
+              }
+            });
+            console.log(response.data);
             setTickets(response.data);
 
             if (!tickets.length) {

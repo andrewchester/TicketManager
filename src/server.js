@@ -44,18 +44,49 @@ app.post('/login', async (req, res) => {
 });
 
 app.get('/tickets', auth, (req, res) => {
-    tickets = [];
+    const {username} = req.headers;
+    console.log('getting tickets for', username);
+    
+    db.get(`SELECT * FROM users WHERE username = ?`, [username], async (err, user) => {
+        if (err) {
+            console.log(err);
+            return res.status(401).send("Invalid username");
+        }
 
-    res.setHeader("Content-Type", "application/json");
-    res.json(tickets);
-    res.status(200);
+        db.all(`SELECT * FROM tickets WHERE user_id = ?`, [user.id], function (err, tickets) {
+            if (err) {
+                console.log(err);
+                return res.status(401).send("Server error.");
+            }
+
+            res.status(200).json(tickets);
+        });
+    });
 });
 
 app.post('/ticket', auth, (req, res) => {    
-    
+    const {username, title, description} = req.body;
 
-    res.status(200);
-    res.send("Added ticket");
+    db.get(`SELECT * FROM users WHERE username = ?`, [username], async (err, user) => {
+        if (err) {
+            console.log(err);
+            return res.status(401).send("Invalid username");
+        }
+
+        db.run(`INSERT INTO tickets (user_id, title, description) VALUES (?, ?, ?)`, [user.id, title, description], function (err) {
+            if (err) {
+                console.log(err);
+                return res.status(401).send("Server error.")
+            }
+
+            console.log('inserted into tickets:');
+            console.log('\t',title);
+            console.log('\t',description);
+            console.log();
+
+            res.status(200).send("Created ticket");
+        });
+    });
 });
 
 
