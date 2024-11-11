@@ -13,3 +13,4 @@ Currently supports:
 TODO:
     - Assign tickets to elevated users to work on.
     - Open / closed status.
+    - Styling + popup info for tickets.
