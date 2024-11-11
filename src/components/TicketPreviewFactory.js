@@ -7,7 +7,7 @@ const TicketPreviewFactory = (ticketData) => {
       title={ticketData.title} 
       description={ticketData.description} 
       status={ticketData.status} 
-    />
+      key={ticketData.title}/>
   );
 };
 

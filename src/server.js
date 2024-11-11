@@ -45,7 +45,6 @@ app.post('/login', async (req, res) => {
 
 app.get('/tickets', auth, (req, res) => {
     const {username} = req.headers;
-    console.log('getting tickets for', username);
     
     db.get(`SELECT * FROM users WHERE username = ?`, [username], async (err, user) => {
         if (err) {
@@ -78,11 +77,6 @@ app.post('/ticket', auth, (req, res) => {
                 console.log(err);
                 return res.status(401).send("Server error.")
             }
-
-            console.log('inserted into tickets:');
-            console.log('\t',title);
-            console.log('\t',description);
-            console.log();
 
             res.status(200).send("Created ticket");
         });
