@@ -78,7 +78,7 @@ app.post('/ticket', auth, (req, res) => {
                 return res.status(401).send("Server error.")
             }
 
-            res.status(200).send("Created ticket");
+            res.status(200).send();
         });
     });
 });

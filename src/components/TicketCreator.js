@@ -37,8 +37,6 @@ const TicketCreator = ({closeForm}) => {
         try {
             const response = await axios.post('http://localhost:5000/ticket', ticket);
       
-            console.log('Response:', response.data);
-      
             setTitle('');
             setDescription('');
         } catch (err) {

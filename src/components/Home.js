@@ -9,9 +9,16 @@ import TicketPreviewFactory from './TicketPreviewFactory';
 import '../styles/header.css';
 import '../styles.css'
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 function Home() {
     const [tickets, setTickets] = useState([]);
+    const [openCount, setOpenCount] = useState(0);
+    const [closedCount, setClosedCount] = useState(0);
     const [message, setMessage] = useState('');
+    const [viewOpenTickets, setViewOpenTickets] = useState(true);
     const navigate = useNavigate();
     const {auth, username} = useAuth();
 
@@ -32,8 +39,17 @@ function Home() {
                   username: username
               }
             });
-            console.log(response.data);
             setTickets(response.data);
+        
+            let nclosed = 0;
+            for (const ticket of tickets) {
+              if (ticket.status == 'Closed') {
+                nclosed++;
+              }
+            }
+
+            setClosedCount(nclosed);
+            setOpenCount(tickets.length - nclosed);
 
             if (!tickets.length) {
               setMessage("No tickets to display.");
@@ -41,13 +57,16 @@ function Home() {
         } catch (err) {
           setMessage("Error fetching tickets.");
         }
+
       };
+
       fetchTickets();
-    }, []);
+      setTimeout(() => { }, 500);
+    }, [tickets, openCount, closedCount]);
     
     return (
         <div>
-            <Header openTickets={tickets.length} closedTickets={tickets.length}/>
+            <Header openTickets={openCount} closedTickets={closedCount}/>
 
             <div className="ticket-list">
                 {

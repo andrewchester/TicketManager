@@ -2,9 +2,8 @@ import React, {useState} from 'react';
 import '../styles/ticket.css';
 
 const TicketPreview = ({ title, description, status }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false); // State to track modal visibility
-  const [updateText, setUpdateText] = useState(''); // State to handle updates
-  const [ticketStatus, setTicketStatus] = useState(status); // State for ticket status
+  const [isModalOpen, setIsModalOpen] = useState(false); 
+ const [ticketStatus, setTicketStatus] = useState(status); 
   
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -12,7 +11,6 @@ const TicketPreview = ({ title, description, status }) => {
 
   const handleUpdateSubmit = () => {
     if (updateText.length > 0 && updateText.length <= 100) {
-      alert(`Update added: ${updateText}`); 
       setUpdateText(''); 
     } else {
       alert('Update must be between 1 and 100 characters.');
@@ -21,7 +19,6 @@ const TicketPreview = ({ title, description, status }) => {
 
   const handleCloseTicket = () => {
     setTicketStatus('closed');
-    alert('Ticket closed!');
   };
   
   return (
@@ -37,7 +34,9 @@ const TicketPreview = ({ title, description, status }) => {
       {isModalOpen && (
         <div className="modal-overlay" onClick={closeModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close-button" onClick={closeModal}>X</button>
+            <button className="modal-close-button" onClick={closeModal}>
+                &times;
+            </button>
             <h2 className="modal-title">{title}</h2>
             <p className="modal-description">{description}</p>
             
