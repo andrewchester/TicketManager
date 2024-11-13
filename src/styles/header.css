@@ -1,5 +1,5 @@
 .header {
-    background-color: #f1f1f1;
+    background-color: #f9f9f9;
     padding: 8px 15px;
     display: flex;
     justify-content: center;
@@ -58,6 +58,11 @@
 
 .navbar-element:hover {
     cursor: pointer;
+}
+
+.selected {
+    font-weight: bold;
+    /*background-color: #f1f1f1;*/
 }
 
 .navbar-logo {

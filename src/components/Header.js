@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 
 import TicketCreator from './TicketCreator';
 
-const Header = ({openTickets, closedTickets}) => {
+const Header = ({openTickets, closedTickets, viewingOpenTickets, viewOpenTickets, viewClosedTickets}) => {
     const [userInfoToggle, setUserInfoToggle] = useState(false);
     const [ticketFormVisible, setTicketFormVisible] = useState(false);
     const {username} = useAuth();
@@ -33,20 +33,20 @@ const Header = ({openTickets, closedTickets}) => {
     React.useEffect(() => {
         document.addEventListener('click', untoggleUserInfo);
         return () => {
-          document.removeEventListener('click', untoggleUserInfo);
+            document.removeEventListener('click', untoggleUserInfo);
         };
-      }, []);
+    }, []);
 
     return (
         <div className={userInfoToggle ? "header-user-info" : "header"}>
             <div className="navbar-element">
                 <img className="navbar-logo" src={ticketicon} alt="Ticket Logo" />
             </div>
-            <div className="navbar-element">
-                <a href="/">Open</a>
+            <div className={`navbar-element ${viewingOpenTickets ? "selected" : "unselected"}`}>
+                <a onClick={viewOpenTickets}>Open</a>
             </div>
-            <div className="navbar-element">
-                <a href="/history">Closed</a>
+            <div className={`navbar-element ${viewingOpenTickets ? "unselected" : "selected"}`}>
+                <a onClick={viewClosedTickets}>Closed</a>
             </div>
             <div className="navbar-element">
                 <p id="new-ticket" onClick={openTicketForm}>+</p>

@@ -3,7 +3,8 @@ import '../styles/ticket.css';
 
 const TicketPreview = ({ title, description, status }) => {
   const [isModalOpen, setIsModalOpen] = useState(false); 
- const [ticketStatus, setTicketStatus] = useState(status); 
+  const [ticketStatus, setTicketStatus] = useState(status); 
+  const [updateText, setUpdateText] = useState('');
   
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -27,7 +28,7 @@ const TicketPreview = ({ title, description, status }) => {
         <h3 className="ticket-title">{title}</h3>
         <p className="ticket-description">{description}</p>
         <p className={`ticket-status ${ticketStatus === 'closed' ? 'closed' : ''}`}>
-          Status: {ticketStatus}
+          Status: {ticketStatus ? "Open" : "Closed"}
         </p>
       </div>
 

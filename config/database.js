@@ -15,16 +15,18 @@ db.serialize(() => {
     username TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL,
     email TEXT UNIQUE,
-    elevated BOOL NOT NULL
+    level INTEGER NOT NULL
   )`);
 
   db.run(`CREATE TABLE IF NOT EXISTS tickets (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER,
     agent_id INTEGER,
+    owner TEXT,
+    agent TEXT,
     title TEXT NOT NULL,
     description TEXT,
-    status TEXT DEFAULT 'Open',
+    status BOOL DEFAULT True,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users (id),
     FOREIGN KEY (agent_id) REFERENCES users (id)
@@ -36,7 +38,7 @@ db.serialize(() => {
         return;
     }
 
-    db.run(`INSERT INTO users (username, password, elevated) VALUES (?, ?, TRUE)`, [ADMIN_USER, hashed], function (err) {
+    db.run(`INSERT INTO users (username, password, elevated) VALUES (?, ?, 3)`, [ADMIN_USER, hashed], function (err) {
       if (err) {
         console.log(err);
       }
