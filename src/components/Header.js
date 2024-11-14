@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import ticketicon from '../res/ticketicon.png'
 import usericon from '../res/user.png'
 import { useAuth } from '../contexts/AuthContext';
@@ -8,7 +9,8 @@ import TicketCreator from './TicketCreator';
 const Header = ({openTickets, closedTickets, viewingOpenTickets, viewOpenTickets, viewClosedTickets}) => {
     const [userInfoToggle, setUserInfoToggle] = useState(false);
     const [ticketFormVisible, setTicketFormVisible] = useState(false);
-    const {username} = useAuth();
+    const {username, logout} = useAuth();
+    const navigate = useNavigate();
 
     const toggleUserInfo = () => {
         setUserInfoToggle(!userInfoToggle);
@@ -29,6 +31,11 @@ const Header = ({openTickets, closedTickets, viewingOpenTickets, viewOpenTickets
             setUserInfoToggle(false);
         }
     };
+
+    const handleLogout = (e) => {
+        logout();
+        navigate('/login');
+    }
 
     React.useEffect(() => {
         document.addEventListener('click', untoggleUserInfo);
@@ -64,6 +71,7 @@ const Header = ({openTickets, closedTickets, viewingOpenTickets, viewOpenTickets
                         <li id='navbar-username'>{username}</li>
                         <li>{openTickets} Open</li>
                         <li>{closedTickets} Closed</li>
+                        <li onClick={handleLogout} className="logout-button">Logout</li>
                         </ul>
                     </div>
                 )}
