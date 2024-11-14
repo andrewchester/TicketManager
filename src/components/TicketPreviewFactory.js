@@ -6,7 +6,8 @@ const TicketPreviewFactory = (ticketData) => {
     <TicketPreview  
       title={ticketData.title} 
       description={ticketData.description} 
-      status={ticketData.status} 
+      status={ticketData.status}
+      owner={ticketData.owner} 
       key={ticketData.title}/>
   );
 };

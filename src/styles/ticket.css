@@ -40,6 +40,13 @@
     margin-bottom: 0; 
 }
 
+.ticket-owner {
+    font-size: 0.7rem;
+    color: #888;
+    margin-top: 8px; 
+    margin-bottom: 0; 
+}
+
 .ticket-status.closed {
     color: #28a745; 
     font-weight: bold;

@@ -13,76 +13,83 @@ app.use(express.json());
 
 app.post('/register', async (req, res) => {
     const {username, password} = req.body;
-    const hashed = await bcrypt.hash(password, 10);
 
-    db.run(`INSERT INTO users (username, password, elevated) VALUES (?, ?, FALSE)`, [username, hashed], function (err) {
-        if (err) {
-            console.log(err);
-            return res.status(401).send("Invalid registration.")
+    success = await db.newUser(username, password);
+
+    if (!success)
+        return res.status(500).send("Error registering user.");
+
+    const token = jwt.sign({ id: this.lastID }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    response = {
+        token: token,
+        user: {
+            username: username,
+            level: 1
         }
+    }
 
-        const token = jwt.sign({ id: this.lastID }, process.env.JWT_SECRET, { expiresIn: '1h' });
-        res.status(201).json({ token, message: `${username} registered` });
-
-        console.log('registered', username);
-    });
+    res.status(201).json(response);
 });
 
 app.post('/login', async (req, res) => {
     const {username, password} = req.body;
     
-    db.get(`SELECT * FROM users WHERE username = ?`, [username], async (err, user) => {
-        if (!user || !(await bcrypt.compare(password, user.password))) {
-            return res.status(401).send("Invalid login.");
+    const user = await db.getUser(username);
+
+    if (!user || !(await bcrypt.compare(password, user.password)))
+        return res.status(401).send("Invalid login.");
+
+    const token = jwt.sign({id: user.id}, process.env.JWT_SECRET, {expiresIn: '1h'});
+    response = {
+        token: token,
+        user: {
+            username: username,
+            level: user.level
         }
-
-        console.log(username, 'logged in');
-
-        const token = jwt.sign({id: user.id}, process.env.JWT_SECRET, {expiresIn: '1h'});
-        res.json({token});
-    });
-});
-
-app.get('/tickets', auth, (req, res) => {
-    const {username} = req.headers;
+    }
     
-    db.get(`SELECT * FROM users WHERE username = ?`, [username], async (err, user) => {
-        if (err) {
-            console.log(err);
-            return res.status(401).send("Invalid username");
-        }
-
-        db.all(`SELECT * FROM tickets WHERE user_id = ?`, [user.id], function (err, tickets) {
-            if (err) {
-                console.log(err);
-                return res.status(401).send("Server error.");
-            }
-
-            res.status(200).json(tickets);
-        });
-    });
+    res.json(response);
 });
 
-app.post('/ticket', auth, (req, res) => {    
+app.get('/tickets', auth, async (req, res) => {
+    const {username} = req.headers;
+
+    const user = await db.getUser(username);
+
+    if (!user)
+        return res.status(500).send("Invalid user.");
+
+    let perms = user.level != db.level.user;
+    const {success, tickets} = perms ? await db.getAllTickets() : await db.getUserTickets(user.id);
+        
+    if (!success)
+        return res.status(500).send("Server error");
+
+    res.json(tickets);
+});
+
+app.post('/ticket', auth, async (req, res) => {    
     const {username, title, description} = req.body;
 
-    db.get(`SELECT * FROM users WHERE username = ?`, [username], async (err, user) => {
-        if (err) {
-            console.log(err);
-            return res.status(401).send("Invalid username");
-        }
+    const user = await db.getUser(username);
 
-        db.run(`INSERT INTO tickets (user_id, title, description) VALUES (?, ?, ?)`, [user.id, title, description], function (err) {
-            if (err) {
-                console.log(err);
-                return res.status(401).send("Server error.")
-            }
+    if (!user)
+        return res.status(401).send("Invalid username");
 
-            console.log("Successfully created ticket:", title);
+    ticket = {
+        user_id: user.id,
+        owner: username,
+        title: title,
+        description: description
+    }
 
-            res.status(200).send();
-        });
-    });
+    success = await db.newTicket(ticket);
+
+    if (!success)
+        return res.status(500).send("Server error. Could not create ticket.");
+
+    res.status(200).send("Created ticket");
 });
 
 

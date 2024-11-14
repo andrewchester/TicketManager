@@ -6,6 +6,12 @@ require('dotenv').config({path:'../.env'});
 const ADMIN_USER = process.env.ADMIN_USER;
 const ADMIN_PASS = process.env.ADMIN_PASS;
 
+const level = {
+    user: 1,
+    agent: 2,
+    admin: 3
+}
+
 // Create tables:
 //      users -- submit tickets and take on tickets (if elevated perms)
 //      tickets -- the actual tickets
@@ -38,7 +44,7 @@ db.serialize(() => {
         return;
     }
 
-    db.run(`INSERT INTO users (username, password, elevated) VALUES (?, ?, 3)`, [ADMIN_USER, hashed], function (err) {
+    db.run(`INSERT INTO users (username, password, level) VALUES (?, ?, 3)`, [ADMIN_USER, hashed], function (err) {
       if (err) {
         console.log(err);
       }
@@ -48,4 +54,89 @@ db.serialize(() => {
   });
 });
 
-module.exports = db;
+async function getUser(username) {
+    const query = `SELECT * FROM users WHERE username = ?`;
+
+    return new Promise((resolve, reject) => {
+        db.get(query, [username], async (err, user) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+
+            resolve(user);
+        });
+    });
+}
+
+async function getUserTickets(user_id) {
+    const query = `SELECT * FROM tickets WHERE user_id = ?`;
+
+    return new Promise((resolve, reject) => {
+        db.all(query, [user_id], (err, tickets) => {
+            if (err) {
+                reject({success: false, tickets: []});
+                return;
+            }
+
+            resolve({success: true, tickets: tickets});
+        });
+    });
+}
+
+async function getAllTickets() {
+    const query = `SELECT * FROM tickets`;
+
+    return new Promise((resolve, reject) => {
+        db.all(query, (err, tickets) => {
+            if (err) {
+                reject({success: false, tickets: []});
+                return;
+            }
+
+            resolve({success: true, tickets: tickets});
+        });
+    });
+}
+
+async function newUser(username, password) {
+    const query = `INSERT INTO users (username, password, level) VALUES (?, ?, 1)`;
+    const hashed = await bcrypt.hash(password, 10);
+
+    return new Promise((resolve, reject) => {
+      db.run(query, [username, hashed], function (err) {
+          if (err) {
+              reject(false);
+              return;
+          }
+
+          resolve(true);
+      });
+    });
+}
+
+async function newTicket(ticket) {
+    const {user_id, owner, title, description} = ticket;
+    const query = `INSERT INTO tickets (user_id, owner, title, description) VALUES (?, ?, ?, ?)`;
+
+    return new Promise((resolve, reject) => {
+        db.run(query, [user_id, owner, title, description], (err) => {
+            if (err) {
+                reject(false);
+                return;
+            }
+
+            resolve(true);
+        })
+    });
+}
+
+module.exports = {
+  db,
+  level,
+  getUser,
+  getUserTickets,
+  getAllTickets,
+  newUser,
+  newTicket
+};

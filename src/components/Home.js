@@ -9,8 +9,6 @@ import TicketPreviewFactory from './TicketPreviewFactory';
 import '../styles/header.css';
 import '../styles.css'
 
-const delay = ms => new Promise(res => setTimeout(res, ms));
-
 function Home() {
     const [tickets, setTickets] = useState([]);
     const [displayedTickets, setDisplayedTickets] = useState([]);
@@ -68,7 +66,6 @@ function Home() {
       };
 
       fetchTickets();
-      delay(500);
     }, [tickets, openCount, closedCount]);
     
     return (

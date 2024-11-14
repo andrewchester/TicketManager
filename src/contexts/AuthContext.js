@@ -9,6 +9,7 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [username, setUsername] = useState(null);
+    const [userLevel, setUserLevel] = useState(1);
     const [auth, setAuth] = useState({
         authenticated: false, 
         token: localStorage.getItem('token') || null,
@@ -29,7 +30,8 @@ export const AuthProvider = ({ children }) => {
           authenticated: true,
           token,
         });
-        setUsername(user);
+        setUsername(user.username);
+        setUserLevel(user.level);
     };
 
     const logout = () => {
@@ -39,6 +41,7 @@ export const AuthProvider = ({ children }) => {
           token: null,
         });
         setUsername(null);
+        setUserLevel(1);
     };
 
     return (

@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import '../styles/ticket.css';
 
-const TicketPreview = ({ title, description, status }) => {
+const TicketPreview = ({ title, description, owner, status }) => {
   const [isModalOpen, setIsModalOpen] = useState(false); 
   const [ticketStatus, setTicketStatus] = useState(status); 
   const [updateText, setUpdateText] = useState('');
@@ -19,7 +19,7 @@ const TicketPreview = ({ title, description, status }) => {
   };
 
   const handleCloseTicket = () => {
-    setTicketStatus('closed');
+    setTicketStatus(false);
   };
   
   return (
@@ -27,8 +27,11 @@ const TicketPreview = ({ title, description, status }) => {
       <div className="ticket-container" onClick={openModal}>
         <h3 className="ticket-title">{title}</h3>
         <p className="ticket-description">{description}</p>
-        <p className={`ticket-status ${ticketStatus === 'closed' ? 'closed' : ''}`}>
+        <p className={`ticket-status ${ticketStatus ? '' : 'closed'}`}>
           Status: {ticketStatus ? "Open" : "Closed"}
+        </p>
+        <p className="ticket-owner">
+          Owner: {owner}
         </p>
       </div>
 
