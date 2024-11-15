@@ -38,6 +38,14 @@ db.serialize(() => {
     FOREIGN KEY (agent_id) REFERENCES users (id)
   )`);
 
+  db.run(`CREATE TABLE IF NOT EXISTS updates (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ticket_id INTEGER,
+    text TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (ticket_id) REFERENCES tickets (id)
+  )`);
+
   bcrypt.hash(ADMIN_PASS, 10, (err, hashed) => {
     if (err) {
         console.error('Error hashing admin pass:', err);
@@ -53,6 +61,21 @@ db.serialize(() => {
     });
   });
 });
+
+async function getUpdates(ticket_id) {
+    const query = `SELECT text, created_at FROM updates WHERE ticket_id = ?`;
+
+    return new Promise((resolve, reject) => {
+        db.all(query, [ticket_id], (err, updates) => {
+            if (err) {
+                reject({success: false, updates: []});
+                return;
+            }
+
+            resolve({success: true, updates: updates});
+        });
+    });
+}
 
 async function getUser(username) {
     const query = `SELECT * FROM users WHERE username = ?`;
@@ -70,7 +93,7 @@ async function getUser(username) {
 }
 
 async function getUserTickets(user_id) {
-    const query = `SELECT * FROM tickets WHERE user_id = ?`;
+    const query = `SELECT title, owner, agent, description, created_at, status FROM tickets WHERE user_id = ?`;
 
     return new Promise((resolve, reject) => {
         db.all(query, [user_id], (err, tickets) => {
@@ -85,11 +108,12 @@ async function getUserTickets(user_id) {
 }
 
 async function getAllTickets() {
-    const query = `SELECT * FROM tickets`;
+    const query = `SELECT title, owner, agent, description, created_at, status FROM tickets`;
 
     return new Promise((resolve, reject) => {
         db.all(query, (err, tickets) => {
             if (err) {
+                console.log(err);
                 reject({success: false, tickets: []});
                 return;
             }

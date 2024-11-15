@@ -8,6 +8,7 @@ const TicketCreator = ({closeForm}) => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [submitting, setSubmitting] = useState(false);
+    const {auth} = useAuth();
 
     const popupRef = useRef(null);
 

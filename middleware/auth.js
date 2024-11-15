@@ -5,6 +5,7 @@ const auth = (req, res, next) => {
                && req.headers.authorization.split(' ')[1];
 
     if (!token) {
+        console.log("missing token");
         return res.sendStatus(403);
     }
 

@@ -53,7 +53,7 @@ app.post('/login', async (req, res) => {
 });
 
 app.get('/tickets', auth, async (req, res) => {
-    const {username} = req.headers;
+    const {username} = req.query;
 
     const user = await db.getUser(username);
 

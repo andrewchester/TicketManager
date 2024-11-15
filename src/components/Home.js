@@ -17,22 +17,23 @@ function Home() {
     const [message, setMessage] = useState('');
     const [viewingOpenTickets, setViewOpenTickets] = useState(true);
     const navigate = useNavigate();
-    const {auth, username} = useAuth();
+    const {auth, username, logout} = useAuth();
 
     useEffect(() => {
       if (!auth.authenticated) {
-        navigate('/login');
+          logout();
+          navigate('/login');
       }
     }, [auth, navigate]);
 
     const viewOpenTickets = () => {
-      setViewOpenTickets(true);
-      setDisplayedTickets(tickets.filter((ticket) => ticket.status == viewingOpenTickets));
+        setViewOpenTickets(true);
+        setDisplayedTickets(tickets.filter((ticket) => ticket.status == viewingOpenTickets));
     }
 
     const viewClosedTickets = () => {
-      setViewOpenTickets(false);
-      setDisplayedTickets(tickets.filter((ticket) => ticket.status == viewingOpenTickets));
+        setViewOpenTickets(false);
+        setDisplayedTickets(tickets.filter((ticket) => ticket.status == viewingOpenTickets));
     }
 
     // fetch tickets from server
@@ -42,26 +43,27 @@ function Home() {
       const fetchTickets = async () => {
         try {
             const response = await axios.get(`http://localhost:5000/tickets`, {
-              headers: {
-                  username: username
-              }
+                params: {
+                    username: username
+                }
             });
+
             setTickets(response.data);
             setDisplayedTickets(tickets.filter((ticket) => ticket.status == viewingOpenTickets));
 
             if (viewingOpenTickets) {
-              setClosedCount(tickets.length - displayedTickets.length);
-              setOpenCount(displayedTickets.length);
+                setClosedCount(tickets.length - displayedTickets.length);
+                setOpenCount(displayedTickets.length);
             } else {
-              setClosedCount(displayedTickets.length);
-              setOpenCount(tickets.length - displayedTickets.length);
+                setClosedCount(displayedTickets.length);
+                setOpenCount(tickets.length - displayedTickets.length);
             }
 
             if (!displayedTickets.length) {
-              setMessage("No tickets to display.");
+                setMessage("No tickets to display.");
             }
         } catch (err) {
-          setMessage("Error fetching tickets.");
+            setMessage("Error fetching tickets.");
         }
       };
 

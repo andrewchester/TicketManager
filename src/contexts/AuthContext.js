@@ -9,37 +9,34 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [username, setUsername] = useState(null);
-    const [userLevel, setUserLevel] = useState(1);
+    const [level, setUserLevel] = useState(1);
     const [auth, setAuth] = useState({
         authenticated: false, 
         token: localStorage.getItem('token') || null,
     });
 
-    useEffect(() => {
-        if (auth.token) {
-          axios.defaults.headers.common['Authorization'] = `Bearer ${auth.token}`;
-          axios.defaults.headers.common['user'] = username;
-        } else {
-          delete axios.defaults.headers.common['Authorization'];
-        }
-    }, [auth.token]);
-
     const login = (token, user) => {
         localStorage.setItem('token', token);
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
         setAuth({
           authenticated: true,
-          token,
+          token: token,
         });
+        
         setUsername(user.username);
         setUserLevel(user.level);
     };
 
     const logout = () => {
         localStorage.removeItem('token');
+        delete axios.defaults.headers.common['Authorization'];
+
         setAuth({
           authenticated: false,
           token: null,
         });
+        
         setUsername(null);
         setUserLevel(1);
     };
@@ -49,7 +46,7 @@ export const AuthProvider = ({ children }) => {
           {children}
         </AuthContext.Provider>
     );
-  };
+};
 
 export const useAuth = () => {
   return useContext(AuthContext);
