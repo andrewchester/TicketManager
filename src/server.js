@@ -49,8 +49,7 @@ app.post('/login', async (req, res) => {
         }
     }
 
-
-    res.json(response);
+    res.status(200).json(response);
 });
 
 app.get('/tickets', auth, async (req, res) => {

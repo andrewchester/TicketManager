@@ -11,6 +11,8 @@ const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [loggingIn, setLoggingIn] = useState(true);
+    const [success, setSuccess] = useState(false);
+    const [message, setMessage] = useState('');
     const navigate = useNavigate();
     const {login} = useAuth();
 
@@ -28,6 +30,8 @@ const Login = () => {
             await login(res.data.token, res.data.user);
             navigate('/');
         } catch (err) {
+            setSuccess(false);
+            setMessage(loggingIn ? 'Login failed' : 'Registration failed');
             console.log("Error: " + err);
         }
     };
@@ -54,6 +58,9 @@ const Login = () => {
                         {loggingIn ? 'Login' : 'Register'}
                     </button>
                 </form>
+
+                <p id="login-message" className={success ? 'success' : 'failure'}>{message}</p>
+
                 <button id="toggle-button" onClick={toggleLogin}>
                     {loggingIn ? 'Register Instead' : 'Login to an existing account'}
                 </button>
