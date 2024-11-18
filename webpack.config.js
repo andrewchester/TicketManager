@@ -20,6 +20,10 @@ module.exports = {
           context: ['/ticket'],
           target: 'http://localhost:5000',
         },
+        {
+          context: ['/users'],
+          target: 'http://localhost:5000'
+        }
     ]
   },
   module: {

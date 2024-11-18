@@ -9,7 +9,7 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [username, setUsername] = useState(null);
-    const [level, setUserLevel] = useState(1);
+    const [level, setUserLevel] = useState(null);
     const [auth, setAuth] = useState({
         authenticated: false, 
         token: localStorage.getItem('token') || null,
@@ -20,12 +20,12 @@ export const AuthProvider = ({ children }) => {
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
         setAuth({
-          authenticated: true,
-          token: token,
+            authenticated: true,
+            token: token,
         });
-        
-        setUsername(user.username);
+
         setUserLevel(user.level);
+        setUsername(user.username);
     };
 
     const logout = () => {
@@ -33,16 +33,16 @@ export const AuthProvider = ({ children }) => {
         delete axios.defaults.headers.common['Authorization'];
 
         setAuth({
-          authenticated: false,
-          token: null,
+            authenticated: false,
+            token: null,
         });
-        
+
         setUsername(null);
-        setUserLevel(1);
+        setUserLevel(null);
     };
 
     return (
-        <AuthContext.Provider value={{ auth, username, login, logout }}>
+        <AuthContext.Provider value={{ auth, username, level, login, logout }}>
           {children}
         </AuthContext.Provider>
     );

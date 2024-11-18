@@ -48,7 +48,8 @@ app.post('/login', async (req, res) => {
             level: user.level
         }
     }
-    
+
+
     res.json(response);
 });
 
@@ -67,6 +68,24 @@ app.get('/tickets', auth, async (req, res) => {
         return res.status(500).send("Server error");
 
     res.json(tickets);
+});
+
+app.get('/users', auth, async (req, res) => {
+    const {username} = req.query;
+    const user = await db.getUser(username);
+
+    if (!user)
+        return res.status(500).send("Invalid user.");
+
+    if (user.level != db.level.admin)
+        return res.status(403).send("Protected route");
+
+    const {success, users} = await db.getUsersSummary();
+
+    if (!success)
+        return res.status(500).send("Server error");
+
+    res.json(users);
 });
 
 app.post('/ticket', auth, async (req, res) => {    
@@ -92,6 +111,28 @@ app.post('/ticket', auth, async (req, res) => {
     res.status(200).send("Created ticket");
 });
 
+app.post('/updateUserLevel', auth, async (req, res) => {
+    const {username, updates} = req.body; // key pairs
+
+    const sourceUser = await db.getUser(username);
+
+    if (!sourceUser)
+        return res.status(401).send("Invalid user");
+
+    if (sourceUser.level != db.level.admin)
+        return res.status(403).send("Unauthorized");
+
+    let success = true;
+    for (const [user, newlevel] of Object.entries(updates))
+        success &= await db.setUserLevel(user, newlevel);
+
+    const users = await db.getUsersSummary();
+
+    if (!success)
+        return res.status(500).send("Server error");
+
+    res.status(200).send("Updated");
+});
 
 const PORT = process.env.BACKEND_PORT || 5000;
 app.listen(PORT, () => {

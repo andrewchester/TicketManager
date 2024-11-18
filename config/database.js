@@ -53,11 +53,11 @@ db.serialize(() => {
     }
 
     db.run(`INSERT INTO users (username, password, level) VALUES (?, ?, 3)`, [ADMIN_USER, hashed], function (err) {
-      if (err) {
-        console.log(err);
-      }
+        if (err) {
+            console.log(err);
+        }
 
-      console.log("initialized root user");
+        console.log("initialized root user");
     });
   });
 });
@@ -68,6 +68,7 @@ async function getUpdates(ticket_id) {
     return new Promise((resolve, reject) => {
         db.all(query, [ticket_id], (err, updates) => {
             if (err) {
+                console.log('getUpdates()', err);
                 reject({success: false, updates: []});
                 return;
             }
@@ -83,6 +84,7 @@ async function getUser(username) {
     return new Promise((resolve, reject) => {
         db.get(query, [username], async (err, user) => {
             if (err) {
+                console.log('getUser()', err);
                 reject(err);
                 return;
             }
@@ -98,6 +100,7 @@ async function getUserTickets(user_id) {
     return new Promise((resolve, reject) => {
         db.all(query, [user_id], (err, tickets) => {
             if (err) {
+              console.log('getUserTickets()', err);
                 reject({success: false, tickets: []});
                 return;
             }
@@ -113,12 +116,28 @@ async function getAllTickets() {
     return new Promise((resolve, reject) => {
         db.all(query, (err, tickets) => {
             if (err) {
-                console.log(err);
+              console.log('getAllTickets()', err);
                 reject({success: false, tickets: []});
                 return;
             }
 
             resolve({success: true, tickets: tickets});
+        });
+    });
+}
+
+async function getUsersSummary() {
+    const query = `SELECT username, level FROM users`;
+
+    return new Promise((resolve, reject) => {
+        db.all(query, (err, users) => {
+            if (err) {
+                console.log('getUsersSummary()', err);
+                reject({success: false, users: []});
+                return;
+            }
+
+            resolve({success: true, users: users});
         });
     });
 }
@@ -130,6 +149,7 @@ async function newUser(username, password) {
     return new Promise((resolve, reject) => {
       db.run(query, [username, hashed], function (err) {
           if (err) {
+              console.log('newUser()', err);
               reject(false);
               return;
           }
@@ -146,6 +166,7 @@ async function newTicket(ticket) {
     return new Promise((resolve, reject) => {
         db.run(query, [user_id, owner, title, description], (err) => {
             if (err) {
+                console.log('newTicket()', err);
                 reject(false);
                 return;
             }
@@ -155,12 +176,31 @@ async function newTicket(ticket) {
     });
 }
 
+async function setUserLevel(username, level) {
+    const query = `UPDATE users SET level = ? WHERE id = ?`;
+    const user = await getUser(username);
+
+    return new Promise((resolve, reject) => {
+        db.run(query, [level, user.id], (err) => {
+            if (err) {
+                console.log("setUserLevel()", err);
+                reject(false);
+                return;
+            }
+
+            resolve(true);
+        });
+    });
+}
+
 module.exports = {
   db,
   level,
   getUser,
   getUserTickets,
   getAllTickets,
+  getUsersSummary,
+  setUserLevel,
   newUser,
   newTicket
 };

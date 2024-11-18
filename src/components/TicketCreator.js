@@ -49,7 +49,7 @@ const TicketCreator = ({closeForm}) => {
     };
 
     return (
-            <div className="popup-overlay">
+        <div className="popup-overlay">
             <div className="popup" ref={popupRef}>
                 <button className="close-btn" onClick={closeForm}>
                 &times;
@@ -84,7 +84,7 @@ const TicketCreator = ({closeForm}) => {
                 </button>
                 </form>
             </div>
-            </div>
+        </div>
     );
 };
 

@@ -25,7 +25,7 @@ const Login = () => {
             const endpoint = loggingIn ? '/login' : '/register';
             const res = await axios.post(`${API_URI}${endpoint}`, {username, password});
             
-            await login(res.data.token, res.data.user);    
+            await login(res.data.token, res.data.user);
             navigate('/');
         } catch (err) {
             console.log("Error: " + err);
