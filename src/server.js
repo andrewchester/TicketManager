@@ -29,6 +29,8 @@ app.post('/register', async (req, res) => {
         }
     }
 
+    console.log('created user', username);
+
     res.status(201).json(response);
 });
 
@@ -125,12 +127,73 @@ app.post('/updateUserLevel', auth, async (req, res) => {
     for (const [user, newlevel] of Object.entries(updates))
         success &= await db.setUserLevel(user, newlevel);
 
-    const users = await db.getUsersSummary();
-
     if (!success)
         return res.status(500).send("Server error");
 
     res.status(200).send("Updated");
+});
+
+app.post('/update', auth, async (req, res) => {
+    const {username, title, updateText} = req.body;
+
+    const sourceUser = await db.getUser(username);
+
+    if (!sourceUser)
+        return res.status(401).send("Invalid user");
+
+    let {success, ticket} = await db.getTicketByName(title);
+
+    if (!success)
+        return res.status(500).send("Error fetching ticket.");
+
+    if (sourceUser.level != db.level.admin && ticket.agent != sourceUser.username)
+        return res.status(403).send("Forbidden");
+
+    success = await db.addUpdate(title, username, updateText);
+
+    if (!success)
+        return res.status(500).send("Failed to add update");
+
+    res.status(200).send("Successful update");
+});
+
+app.get('/updates', auth, async (req, res) => {
+    const {username, title} = req.query;
+
+    const sourceUser = await db.getUser(username);
+
+    if (!sourceUser)
+        return res.status(401).send("Invalid user");
+
+    const {ticket} = await db.getTicketByName(title);
+    
+    if (ticket.owner != sourceUser.username && sourceUser.level == db.level.user)
+        return res.status(403).send("Forbidden");
+
+    const {updates} = await db.getUpdates(ticket.id);
+    res.status(200).json(updates);
+});
+
+app.post('/assign', auth, async (req, res) => {
+    const {assigner, assignee, title} = req.body;
+    const assignerUser = await db.getUser(assigner);
+
+    if (!assignerUser)
+        return res.status(401).send("Invalid user");
+
+    const {ticket} = await db.getTicketByName(title);
+
+    if (assignerUser.level == db.level.user || 
+       (ticket.agent != null && assignerUser.level != db.level.admin))
+        return res.status(403).send("Forbidden");
+    
+    success = await db.updateAssignment(ticket.id, assignee);
+
+    if (!success)
+        return res.status(500).send("Server error");
+
+    console.log("Assigned", ticket.title, "to", assignee);
+    res.status(200).send("Assigned");
 });
 
 const PORT = process.env.BACKEND_PORT || 5000;

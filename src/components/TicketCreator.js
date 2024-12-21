@@ -8,7 +8,6 @@ const TicketCreator = ({closeForm}) => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [submitting, setSubmitting] = useState(false);
-    const {auth} = useAuth();
 
     const popupRef = useRef(null);
 
@@ -36,10 +35,10 @@ const TicketCreator = ({closeForm}) => {
         };
 
         try {
-            const response = await axios.post('http://localhost:5000/ticket', ticket);
-      
-            setTitle('');
-            setDescription('');
+            axios.post('http://localhost:5000/ticket', ticket).then((res) => {
+                setTitle('');
+                setDescription('');
+            });
         } catch (err) {
             console.error('Error:', err);
         } finally {

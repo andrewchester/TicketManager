@@ -7,7 +7,9 @@ const TicketPreviewFactory = (ticketData) => {
       title={ticketData.title} 
       description={ticketData.description} 
       status={ticketData.status}
-      owner={ticketData.owner} 
+      owner={ticketData.owner}
+      agent={ticketData.agent}
+      created_at={ticketData.created_at} 
       key={ticketData.title}/>
   );
 };

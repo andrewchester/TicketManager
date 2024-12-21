@@ -29,7 +29,7 @@ db.serialize(() => {
     user_id INTEGER,
     agent_id INTEGER,
     owner TEXT,
-    agent TEXT,
+    agent TEXT default NULL,
     title TEXT NOT NULL,
     description TEXT,
     status BOOL DEFAULT True,
@@ -41,6 +41,7 @@ db.serialize(() => {
   db.run(`CREATE TABLE IF NOT EXISTS updates (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     ticket_id INTEGER,
+    author TEXT NOT NULL,
     text TEXT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (ticket_id) REFERENCES tickets (id)
@@ -60,10 +61,12 @@ db.serialize(() => {
         console.log("initialized root user");
     });
   });
+
+  developmentEnvironment();
 });
 
 async function getUpdates(ticket_id) {
-    const query = `SELECT text, created_at FROM updates WHERE ticket_id = ?`;
+    const query = `SELECT text, author, created_at FROM updates WHERE ticket_id = ?`;
 
     return new Promise((resolve, reject) => {
         db.all(query, [ticket_id], (err, updates) => {
@@ -74,6 +77,27 @@ async function getUpdates(ticket_id) {
             }
 
             resolve({success: true, updates: updates});
+        });
+    });
+}
+
+async function addUpdate(ticketName, author, update) {
+    const query = `INSERT INTO updates (ticket_id, author, text) VALUES (?, ?, ?)`;
+
+    const {success, ticket} = await getTicketByName(ticketName);
+
+    return new Promise((resolve, reject) => {
+        if (!success)
+            resolve(false);
+
+        db.run(query, [ticket.id, author, update], (err) => {
+            if (err) {
+                console.log("addUpdate()", err);
+                reject(false);
+                return;
+            }
+
+            resolve(true);
         });
     });
 }
@@ -90,6 +114,22 @@ async function getUser(username) {
             }
 
             resolve(user);
+        });
+    });
+}
+
+async function getTicketByName(ticket_name) {
+    const query = `SELECT * FROM tickets WHERE title = ?`;
+
+    return new Promise((resolve, reject) => {
+        db.get(query, [ticket_name], (err, ticket) => {
+            if (err) {
+                console.log("getTicketsByName()", err);
+                reject({success: false, ticket: null});
+                return;
+            }
+
+            resolve({success: true, ticket: ticket});
         });
     });
 }
@@ -193,14 +233,57 @@ async function setUserLevel(username, level) {
     });
 }
 
+async function updateAssignment(ticket_id, assignee) {
+    const query = `UPDATE tickets SET agent = ? WHERE id = ?`;
+
+    return new Promise((resolve, reject) => {
+        db.run(query, [assignee, ticket_id], (err) => {
+            if (err) {
+                console.log("updateAssignment()", err);
+                reject(false);
+                return;
+            }
+
+            resolve(true);
+        });
+    });
+}
+
+async function developmentEnvironment() {
+    newUser("elevated", "elevated").then((res) => {
+        console.log("initialized elevated user");
+    }).then(() => {
+        setUserLevel("elevated", level.agent).then((res) => {
+            console.log("elevated user promoted to agent");
+        });
+    });
+
+    newUser("user", "user").then(async (res) => {
+        console.log("initialized base user");
+        const user = await getUser("user");
+        newTicket({
+            user_id: user.id,
+            owner: "user",
+            title: "Example",
+            description: "This is an example ticket."
+        }).then((res) => {
+            console.log("initialized test ticket");
+        });
+    });
+}
+
 module.exports = {
   db,
   level,
   getUser,
   getUserTickets,
   getAllTickets,
+  getTicketByName,
   getUsersSummary,
   setUserLevel,
+  addUpdate,
+  getUpdates,
   newUser,
-  newTicket
+  newTicket,
+  updateAssignment
 };
