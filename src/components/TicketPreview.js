@@ -63,8 +63,20 @@ const TicketPreview = ({ title, description, owner, agent, status, created_at })
     }
   }
 
-  const handleCloseTicket = () => {
-      setTicketStatus(false);
+  const handleCloseTicket = async () => {
+      try {
+        if (ticketStatus) {
+          const res = await axios.post('http://localhost:5000/close', {username, title});
+        } else {
+          const res = await axios.post('http://localhost:5000/reopen', {username, title});
+        }
+
+        setTicketStatus(!ticketStatus);
+        closeModal();
+      } catch (err) {
+        setErrorMessage("Failed to close ticket.");
+      }
+      
   };
 
   useEffect(() => {
@@ -176,8 +188,8 @@ const TicketPreview = ({ title, description, owner, agent, status, created_at })
             </div>
             <div className="button-container">
               <button className="update-ticket-button" onClick={handleUpdateSubmit}>Add Update</button>
-              <button className="close-ticket-button" onClick={handleCloseTicket}>
-                Close Ticket
+              <button className={`close-ticket-button ${status ? "" : "reopen"}`} onClick={handleCloseTicket}>
+                {status ? "Close Ticket" : "Reopen Ticket"}
               </button>
             </div>
           </div>

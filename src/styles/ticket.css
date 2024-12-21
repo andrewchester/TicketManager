@@ -132,6 +132,9 @@
     width: auto; 
     min-width: 120px; 
 }
+.close-ticket-button.reopen {
+    background-color: #ffc107 !important;
+}
 
 .close-ticket-button:hover {
     background-color: #218838;

@@ -196,6 +196,56 @@ app.post('/assign', auth, async (req, res) => {
     res.status(200).send("Assigned");
 });
 
+app.post('/close', auth, async (req, res) => {
+    const {username, title} = req.body;
+    const user = await db.getUser(username);
+
+    console.log(username, title);
+
+    if (!user)
+        return res.status(401).send("Invalid user");
+
+    const {ticket} = await db.getTicketByName(title);
+
+    if (!ticket)
+        return res.status(404).send("Ticket not found");
+
+    if (user.level != db.level.admin && ticket.agent != user.username)
+        return res.status(403).send("Forbidden");
+
+    success = await db.updateTicketStatus(title, false);
+
+    if (!success)
+        return res.status(500).send("Server error");
+
+    console.log("Closed", title);
+    res.status(200).send("Closed");
+});
+
+app.post('/reopen', auth, async (req, res) => {
+    const {username, title} = req.body;
+    const user = await db.getUser(username);
+
+    if (!user)
+        return res.status(401).send("Invalid user");
+
+    const {ticket} = await db.getTicketByName(title);
+
+    if (!ticket)
+        return res.status(404).send("Ticket not found");
+
+    if (user.level != db.level.admin && ticket.agent != user.username)
+        return res.status(403).send("Forbidden");
+
+    success = await db.updateTicketStatus(title, true);
+
+    if (!success)
+        return res.status(500).send("Server error");
+
+    console.log("Reopened", title);
+    res.status(200).send("Reopened");
+});
+
 const PORT = process.env.BACKEND_PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

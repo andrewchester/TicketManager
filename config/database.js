@@ -272,6 +272,22 @@ async function developmentEnvironment() {
     });
 }
 
+async function updateTicketStatus(title, status) {
+    const query = `UPDATE tickets SET status = ? WHERE title = ?`;
+
+    return new Promise((resolve, reject) => {
+        db.run(query, [status, title], (err) => {
+            if (err) {
+                console.log("updateStatus()", err);
+                reject(false);
+                return;
+            }
+
+            resolve(true);
+        });
+    });
+}
+
 module.exports = {
   db,
   level,
@@ -285,5 +301,6 @@ module.exports = {
   getUpdates,
   newUser,
   newTicket,
-  updateAssignment
+  updateAssignment,
+  updateTicketStatus
 };
