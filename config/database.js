@@ -1,7 +1,7 @@
 const sqlite3 = require('sqlite3').verbose();
 const bcrypt = require('bcryptjs');
 const db = new sqlite3.Database(':memory:');
-require('dotenv').config({path:'../.env'});
+require('dotenv').config({path:'./.env'});
 
 const ADMIN_USER = process.env.ADMIN_USER;
 const ADMIN_PASS = process.env.ADMIN_PASS;
